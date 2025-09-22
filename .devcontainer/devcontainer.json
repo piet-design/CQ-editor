@@ -1,0 +1,41 @@
+import cadquery as cq
+
+# Maße
+lochabstand = 96      # mm (Mitte zu Mitte Schrauben)
+durchmesser = 12      # mm (Griffdicke)
+fuss_dicke = 5        # mm (Auflagefläche)
+loch_durchmesser = 4  # mm (für Schrauben)
+bogenhoehe = 30       # mm (Abstand vom Tisch zum Griffbogen)
+
+# Griffbogen (Halbkreis)
+griff_bogen = (
+    cq.Workplane("XY")
+    .threePointArc((0, bogenhoehe), (lochabstand/2, 0))
+    .sweep(cq.Workplane("XZ").circle(durchmesser/2))
+)
+
+# Spiegeln für linke Seite
+griff_bogen = griff_bogen.mirror("YZ", union=True)
+
+# Füße links
+fuss1 = (
+    cq.Workplane("XY")
+    .center(-lochabstand/2, 0)
+    .circle(durchmesser/2)
+    .extrude(fuss_dicke)
+    .faces(">Z").workplane()
+    .hole(loch_durchmesser)
+)
+
+# Füße rechts
+fuss2 = (
+    cq.Workplane("XY")
+    .center(lochabstand/2, 0)
+    .circle(durchmesser/2)
+    .extrude(fuss_dicke)
+    .faces(">Z").workplane()
+    .hole(loch_durchmesser)
+)
+
+# Alles zusammen
+griff = griff_bogen.union(fuss1).union(fus
